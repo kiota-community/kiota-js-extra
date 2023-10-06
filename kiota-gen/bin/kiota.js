@@ -3,8 +3,9 @@
 // ----------------------------------------------------------------------------
 // The following ENV variables can be used to control this tool:
 //
-// KIOTA_VERSION | The version of Kiota to use. | Default: 'latest'
-// KIOTA_DOWNLOAD_BASE | Where to download Kiota from. | Default: 'https://github.com/microsoft/kiota/releases/download'
+// KIOTA_VERSION       | The version of Kiota to use.  | Default: 'latest'
+// KIOTA_DOWNLOAD_URL  | Where to download Kiota from. | Default: 'https://github.com/microsoft/kiota/releases/download'
+// KIOTA_DOWNLOAD_DIR  | Where to download Kiota to.   | Default: './.kiota'
 // ----------------------------------------------------------------------------
 
 
@@ -20,10 +21,15 @@ const GITHUB_REQUEST_OPTIONS = {
         "User-Agent": "node.js/*.*",
     }
 };
-let KIOTA_DOWNLOAD_BASE = process.env["KIOTA_DOWNLOAD_BASE"];
-if (KIOTA_DOWNLOAD_BASE === undefined || KIOTA_DOWNLOAD_BASE === "") {
-    KIOTA_DOWNLOAD_BASE = "https://github.com/microsoft/kiota/releases/download";
+let KIOTA_DOWNLOAD_URL = process.env["KIOTA_DOWNLOAD_URL"];
+if (KIOTA_DOWNLOAD_URL === undefined || KIOTA_DOWNLOAD_URL === "") {
+    KIOTA_DOWNLOAD_URL = "https://github.com/microsoft/kiota/releases/download";
 }
+let KIOTA_DOWNLOAD_DIR = process.env("KIOTA_DOWNLOAD_DIR");
+if (KIOTA_DOWNLOAD_DIR === undefined || KIOTA_DOWNLOAD_DIR === "") {
+    KIOTA_DOWNLOAD_DIR = path.join(process.cwd(), '.kiota');
+}
+
 
 // --------------------------------
 // Imports from dependencies
@@ -89,9 +95,9 @@ const getLatestKiotaReleaseVersion = async () => {
  */
 const downloadAndInstallKiota = async (kiotaVersion, os, arch) => {
     // Create temporary local directory to download/run Kiota CLI from
-    const tmpPath = path.join(process.cwd(), '.kiota');
-    const downloadPath = path.join(tmpPath, `kiota-${kiotaVersion}`);
-    const execPath = path.join(tmpPath, `${kiotaVersion}`);
+    const downloadDir = KIOTA_DOWNLOAD_DIR;
+    const downloadPath = path.join(downloadDir, `kiota-${kiotaVersion}`);
+    const execPath = path.join(downloadDir, `${kiotaVersion}`);
     fs.mkdirSync(execPath, { recursive: true });
 
     // Path to the Kiota CLI
@@ -104,7 +110,7 @@ const downloadAndInstallKiota = async (kiotaVersion, os, arch) => {
     }
 
     return new Promise((resolve, reject) => {
-        const kiotaUrl = `${KIOTA_DOWNLOAD_BASE}/${kiotaVersion}/${os}-${arch}.zip`;
+        const kiotaUrl = `${KIOTA_DOWNLOAD_URL}/${kiotaVersion}/${os}-${arch}.zip`;
         console.log(`Downloading Kiota binary from ${kiotaUrl}`);
         https.get(kiotaUrl, GITHUB_REQUEST_OPTIONS, (res) => {
             const statusCode = res.statusCode;
