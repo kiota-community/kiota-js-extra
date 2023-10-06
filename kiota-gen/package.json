@@ -8,8 +8,7 @@
   },
   "scripts": {
     "clean": "node scripts/clean.js",
-    "build": "node scripts/build.js",
-    "publish": "npm publish dist"
+    "build": "node scripts/build.js"
   },
   "repository": {
     "type": "git",
