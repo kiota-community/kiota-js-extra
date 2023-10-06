@@ -1,0 +1,30 @@
+{
+  "name": "kiota-gen-example",
+  "version": "1.0.0",
+  "description": "Example of how to use the kiota-gen CLI tool.",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rimraf client && rimraf node_modules",
+    "kiota-version": "echo \"Testing kiota-gen\" && kiota --version",
+    "kiota-help": "echo \"Testing kiota-gen\" && kiota --help",
+    "kiota-generate": "echo \"Testing kiota-gen\" && kiota generate -l typescript -d openapi.yaml -c PostsClient -o ./client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Apicurio/kiota-js-extra.git"
+  },
+  "keywords": [
+    "kiota-gen",
+    "example"
+  ],
+  "author": "Eric Wittmann",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Apicurio/kiota-js-extra/issues"
+  },
+  "homepage": "https://github.com/Apicurio/kiota-js-extra#readme",
+  "devDependencies": {
+    "@apicurio/kiota-gen": "file:../kiota-gen",
+    "rimraf": "5.0.5"
+  }
+}

@@ -1,0 +1,218 @@
+#! /usr/bin/env node
+
+// ----------------------------------------------------------------------------
+// The following ENV variables can be used to control this tool:
+//
+// KIOTA_VERSION | The version of Kiota to use. | Default: 'latest'
+// KIOTA_DOWNLOAD_BASE | Where to download Kiota from. | Default: 'https://github.com/microsoft/kiota/releases/download'
+// ----------------------------------------------------------------------------
+
+
+// --------------------------------
+// Define some constants
+// --------------------------------
+const DEFAULT_KIOTA_VERSION = "latest";
+const KIOTA_LATEST_RELEASE_URL= "https://api.github.com/repos/microsoft/kiota/releases/latest";
+// Note: GitHub API requires a user-agent or it will return a 403.
+// The 'https' function of 'follow-redirects' does not send one by default.
+const GITHUB_REQUEST_OPTIONS = {
+    headers: {
+        "User-Agent": "node.js/*.*",
+    }
+};
+let KIOTA_DOWNLOAD_BASE = process.env["KIOTA_DOWNLOAD_BASE"];
+if (KIOTA_DOWNLOAD_BASE === undefined || KIOTA_DOWNLOAD_BASE === "") {
+    KIOTA_DOWNLOAD_BASE = "https://github.com/microsoft/kiota/releases/download";
+}
+
+// --------------------------------
+// Imports from dependencies
+// --------------------------------
+const followRedirects = require("follow-redirects");
+const { https } = followRedirects;
+const fs = require("fs");
+const path = require("path");
+const decompress = require("decompress");
+const shell = require("shelljs");
+
+// --------------------------------
+// Extract configuration from env
+// --------------------------------
+const platform = process.platform;
+const architecture = process.arch;
+
+/**
+ * Gets the latest Kiota release version by using the GitHub API to fetch the
+ * most recent release.
+ * @returns {Promise<unknown>}
+ */
+const getLatestKiotaReleaseVersion = async () => {
+    return new Promise((resolve, reject) => {
+        https.get(KIOTA_LATEST_RELEASE_URL, GITHUB_REQUEST_OPTIONS, (res) => {
+            const statusCode = res.statusCode;
+
+            if (statusCode !== 200) {
+                const error = new Error(`Request Failed.\nStatus Code: ${statusCode}`);
+                console.error(error.message);
+                res.resume();
+                reject(error);
+            } else {
+                let body = "";
+                res.on("data", (chunk) => {
+                    body += chunk;
+                });
+                res.on("end", () => {
+                    try {
+                        let json = JSON.parse(body);
+                        resolve(json["tag_name"]);
+                    } catch (error) {
+                        console.error("Error parsing response from GitHub API.");
+                        reject(error);
+                    }
+                });
+                res.on("error", (err) => {
+                    console.error("Error getting latest Kiota release (using GitHub API).");
+                    reject(err);
+                });
+            }
+        });
+    });
+};
+
+/**
+ * Downloads and installs a specific version of Kiota.  Returns the path to
+ * the downloaded CLI tool.  If the requested version of Kiota has already
+ * been downloaded, it will skip the download and just return the path to
+ * the CLI.
+ * @param kiotaVersion
+ * @returns {Promise<void>}
+ */
+const downloadAndInstallKiota = async (kiotaVersion, os, arch) => {
+    // Create temporary local directory to download/run Kiota CLI from
+    const tmpPath = path.join(process.cwd(), '.kiota');
+    const downloadPath = path.join(tmpPath, `kiota-${kiotaVersion}`);
+    const execPath = path.join(tmpPath, `${kiotaVersion}`);
+    fs.mkdirSync(execPath, { recursive: true });
+
+    // Path to the Kiota CLI
+    const execBinary = path.join(process.cwd(), '.kiota', `${kiotaVersion}`, 'kiota');
+
+    if (fs.existsSync(execBinary)) {
+        // Kiota was already downloaded and/or installed in the .kiota directory
+        console.log(`Kiota binary version ${kiotaVersion} already downloaded at ${downloadPath}`);
+        return Promise.resolve(execBinary);
+    }
+
+    return new Promise((resolve, reject) => {
+        const kiotaUrl = `${KIOTA_DOWNLOAD_BASE}/${kiotaVersion}/${os}-${arch}.zip`;
+        console.log(`Downloading Kiota binary from ${kiotaUrl}`);
+        https.get(kiotaUrl, GITHUB_REQUEST_OPTIONS, (res) => {
+            const statusCode = res.statusCode;
+            if (statusCode !== 200) {
+                const error = new Error(`Request Failed.\nStatus Code: ${statusCode}`);
+                console.error(error.message);
+                res.resume();
+                reject(error);
+            } else {
+                const writeStream = fs.createWriteStream(downloadPath);
+                res.pipe(writeStream);
+                writeStream.on("finish", () => {
+                    console.log(`Kiota binary version ${kiotaVersion} downloaded at ${downloadPath}`);
+                    decompress(downloadPath, execPath)
+                        .then(() => {
+                            resolve(execBinary);
+                        })
+                        .catch((error) => {
+                            reject(error);
+                        });
+                });
+                writeStream.on("error", (err) => {
+                    console.error(`Failed to write Kiota binary version ${kiotaVersion} to ${downloadPath}: ${err.message}`);
+                    reject(err);
+                });
+            }
+        });
+    });
+};
+
+/**
+ * Wraps the 'kiota' command line tool, passing it the arguments provided to this
+ * function.  This function will download the given version of Kiota locally and
+ * then call it.
+ * @param kiotaVersion
+ * @param args
+ * @returns {Promise<number>}
+ */
+const kiota = async (kiotaVersion, args) => {
+    let os = ''
+    if (platform === 'win32') {
+        os = 'win';
+    } else if (platform === 'linux') {
+        os = 'linux';
+    } else if (platform === 'darwin') {
+        os = 'osx';
+    } else {
+        throw new Error(`Unsupported platform: ${platform}`);
+    }
+
+    let arch = '';
+    if (architecture === 'x64') {
+        arch = 'x64';
+    } else if (architecture === 'x86') {
+        arch = 'x86';
+    } else if (architecture === 'arm64') {
+        arch = 'arm64'
+    } else {
+        throw new Error(`Unsupported architecture: ${architecture}`);
+    }
+    console.log(`---`)
+    console.log(`Generating code using:`)
+    console.log(`    Kiota version: ${kiotaVersion}`)
+    console.log(`    Platform: ${os}`)
+    console.log(`    Architecture: ${arch}`)
+    console.log(`---`)
+
+    const kiotaCmd = await downloadAndInstallKiota(kiotaVersion, os, arch);
+    const kiotaCmdWithArgs = kiotaCmd + " " + args.join(" ");
+
+    console.log(kiotaCmdWithArgs);
+
+    // Now execute Kiota with the arguments passed in.
+    return new Promise((resolve, reject) => {
+        shell.exec(kiotaCmdWithArgs, (code, stdout, stderr) => {
+            if (code > 0) {
+                console.error(stderr);
+                reject(new Error("Kiota failed."));
+            } else {
+                console.log(stdout);
+                console.log("---------------------------------------------");
+                console.log("Kiota code generation completed successfully.");
+                console.log("---------------------------------------------");
+                resolve(0);
+            }
+        });
+    });
+};
+
+/**
+ * Main function.
+ * @param args
+ * @returns {Promise<number>}
+ */
+const main = async (...args) => {
+    let kiotaVersion = process.env["KIOTA_VERSION"] || DEFAULT_KIOTA_VERSION;
+    if (kiotaVersion === undefined || kiotaVersion === "" || kiotaVersion === "latest") {
+        kiotaVersion = await getLatestKiotaReleaseVersion();
+    }
+    return kiota(kiotaVersion, args);
+};
+
+// Extract the args from the process and invoke the main function.
+const args = process.argv.slice(2)
+main(...args).then(
+    code => process.exit(code),
+    er => {
+        console.error(er);
+        process.exit(1);
+    }
+);

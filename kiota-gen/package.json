@@ -1,0 +1,33 @@
+{
+  "name": "@apicurio/kiota-gen",
+  "version": "0.0.1",
+  "description": "Wrapper around Kiota command line for generating client SDKs from OpenAPI.",
+  "main": "bin/kiota.js",
+  "bin": {
+    "kiota": "bin/kiota.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Apicurio/kiota-js-extra.git"
+  },
+  "keywords": [
+    "kiota",
+    "openapi",
+    "codegen",
+    "rest"
+  ],
+  "author": "Eric Wittmann",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Apicurio/kiota-js-extra/issues"
+  },
+  "homepage": "https://github.com/Apicurio/kiota-js-extra#readme",
+  "dependencies": {
+    "shelljs": "0.8.5",
+    "follow-redirects": "1.15.3",
+    "decompress": "4.2.1"
+  }
+}
