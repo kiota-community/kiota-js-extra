@@ -1,6 +1,6 @@
 {
   "name": "@apicurio/kiota-gen",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Wrapper around Kiota command line for generating client SDKs from OpenAPI.",
   "main": "bin/kiota.js",
   "bin": {
