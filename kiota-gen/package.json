@@ -7,7 +7,9 @@
     "kiota": "bin/kiota.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "node scripts/clean.js",
+    "build": "node scripts/build.js",
+    "publish": "npm publish dist"
   },
   "repository": {
     "type": "git",
