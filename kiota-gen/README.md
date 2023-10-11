@@ -48,6 +48,7 @@ You can optionally customize the above behavior. This is done by setting ENV var
 The following ENV variables are available:
 
 | Variable Name       | Description                   | Default Value |
-| KIOTA_VERSION       | The version of Kiota to use.  | `latest` |
+| ------------------- | ----------------------------- | ------------- |
+| KIOTA_VERSION       | The version of Kiota to use.  | `latest`      |
 | KIOTA_DOWNLOAD_URL  | Where to download Kiota from. | `https://github.com/microsoft/kiota/releases/download` |
-| KIOTA_DOWNLOAD_DIR  | Where to download Kiota to.   | `./.kiota` |
+| KIOTA_DOWNLOAD_DIR  | Where to download Kiota to.   | `./.kiota`    |
