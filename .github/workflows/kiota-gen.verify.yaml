@@ -1,0 +1,32 @@
+name: Kiota Gen Verify Build
+on:
+  push:
+    paths:
+      - kiota-gen/**
+    branches: [main]
+  pull_request:
+    paths:
+      - kiota-gen/**
+    branches: [main]
+
+jobs:
+  build-verify:
+    name: Verify Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Check Node Version
+        run: node --version
+
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Build Project
+        run: |
+          cd kiota-gen
+          npm install
+          npm run build

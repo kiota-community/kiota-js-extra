@@ -1,6 +1,6 @@
 {
   "name": "@redhat-developer/kiota-gen",
-  "version": "0.1.0",
+  "version": "SNAPSHOT",
   "description": "Wrapper around the Kiota command line for generating client SDKs from OpenAPI.",
   "main": "bin/kiota.js",
   "bin": {
