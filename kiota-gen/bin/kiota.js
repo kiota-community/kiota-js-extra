@@ -22,13 +22,7 @@ const GITHUB_REQUEST_OPTIONS = {
     }
 };
 let KIOTA_DOWNLOAD_URL = process.env["KIOTA_DOWNLOAD_URL"];
-if (KIOTA_DOWNLOAD_URL === undefined || KIOTA_DOWNLOAD_URL === "") {
-    KIOTA_DOWNLOAD_URL = "https://github.com/microsoft/kiota/releases/download";
-}
-let KIOTA_DOWNLOAD_DIR = process.env("KIOTA_DOWNLOAD_DIR");
-if (KIOTA_DOWNLOAD_DIR === undefined || KIOTA_DOWNLOAD_DIR === "") {
-    KIOTA_DOWNLOAD_DIR = path.join(process.cwd(), '.kiota');
-}
+let KIOTA_DOWNLOAD_DIR = process.env["KIOTA_DOWNLOAD_DIR"];
 
 
 // --------------------------------
@@ -46,6 +40,14 @@ const shell = require("shelljs");
 // --------------------------------
 const platform = process.platform;
 const architecture = process.arch;
+
+if (KIOTA_DOWNLOAD_URL === undefined || KIOTA_DOWNLOAD_URL === "") {
+    KIOTA_DOWNLOAD_URL = "https://github.com/microsoft/kiota/releases/download";
+}
+if (KIOTA_DOWNLOAD_DIR === undefined || KIOTA_DOWNLOAD_DIR === "") {
+    KIOTA_DOWNLOAD_DIR = path.join(process.cwd(), '.kiota');
+}
+
 
 /**
  * Gets the latest Kiota release version by using the GitHub API to fetch the

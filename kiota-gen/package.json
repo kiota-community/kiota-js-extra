@@ -1,7 +1,7 @@
 {
-  "name": "@apicurio/kiota-gen",
+  "name": "@redhat-developer/kiota-gen",
   "version": "0.1.0",
-  "description": "Wrapper around Kiota command line for generating client SDKs from OpenAPI.",
+  "description": "Wrapper around the Kiota command line for generating client SDKs from OpenAPI.",
   "main": "bin/kiota.js",
   "bin": {
     "kiota": "bin/kiota.js"
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Apicurio/kiota-js-extra.git"
+    "url": "git+https://github.com/redhat-developer/kiota-js-extra.git"
   },
   "keywords": [
     "kiota",
@@ -20,12 +20,11 @@
     "codegen",
     "rest"
   ],
-  "author": "Eric Wittmann",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/Apicurio/kiota-js-extra/issues"
+    "url": "https://github.com/redhat-developer/kiota-js-extra/issues"
   },
-  "homepage": "https://github.com/Apicurio/kiota-js-extra#readme",
+  "homepage": "https://github.com/redhat-developer/kiota-js-extra#readme",
   "dependencies": {
     "shelljs": "0.8.5",
     "follow-redirects": "1.15.3",
