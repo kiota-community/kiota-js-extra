@@ -189,10 +189,8 @@ const kiota = async (kiotaVersion, args) => {
     return new Promise((resolve, reject) => {
         shell.exec(kiotaCmdWithArgs, (code, stdout, stderr) => {
             if (code > 0) {
-                console.error(stderr);
                 reject(new Error("Kiota failed."));
             } else {
-                console.log(stdout);
                 console.log("---------------------------------------------");
                 console.log("Kiota code generation completed successfully.");
                 console.log("---------------------------------------------");
@@ -212,7 +210,7 @@ const main = async (...args) => {
     if (kiotaVersion === undefined || kiotaVersion === "" || kiotaVersion === "latest") {
         kiotaVersion = await getLatestKiotaReleaseVersion();
     }
-    return kiota(kiotaVersion, args);
+    return await kiota(kiotaVersion, args);
 };
 
 // Extract the args from the process and invoke the main function.
