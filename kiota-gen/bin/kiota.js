@@ -174,7 +174,7 @@ const kiota = async (kiotaVersion, args) => {
         throw new Error(`Unsupported architecture: ${architecture}`);
     }
     console.log(`---`)
-    console.log(`Generating code using:`)
+    console.log(`Executing Kiota CLI using:`)
     console.log(`    Kiota version: ${kiotaVersion}`)
     console.log(`    Platform: ${os}`)
     console.log(`    Architecture: ${arch}`)
@@ -191,9 +191,9 @@ const kiota = async (kiotaVersion, args) => {
             if (code > 0) {
                 reject(new Error("Kiota failed."));
             } else {
-                console.log("---------------------------------------------");
-                console.log("Kiota code generation completed successfully.");
-                console.log("---------------------------------------------");
+                console.log("-------------------------------------------");
+                console.log("Kiota CLI execution completed successfully.");
+                console.log("-------------------------------------------");
                 resolve(0);
             }
         });
