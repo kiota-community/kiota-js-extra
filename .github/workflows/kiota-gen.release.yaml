@@ -26,6 +26,7 @@ jobs:
       - name: Build Project
         run: |
           cd kiota-gen
+          cp ../README.md .
           npm install
           npm run build
 
