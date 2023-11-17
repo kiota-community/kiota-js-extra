@@ -1,5 +1,5 @@
 {
-  "name": "@redhat-developer/kiota-gen",
+  "name": "@kiota/kiota-gen",
   "version": "SNAPSHOT",
   "description": "Wrapper around the Kiota command line for generating client SDKs from OpenAPI.",
   "main": "bin/kiota.js",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/redhat-developer/kiota-js-extra.git"
+    "url": "git+https://github.com/kiota-community/kiota-js-extra.git"
   },
   "keywords": [
     "kiota",
@@ -22,9 +22,9 @@
   ],
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/redhat-developer/kiota-js-extra/issues"
+    "url": "https://github.com/kiota-community/kiota-js-extra/issues"
   },
-  "homepage": "https://github.com/redhat-developer/kiota-js-extra#readme",
+  "homepage": "https://github.com/kiota-community/kiota-js-extra#readme",
   "dependencies": {
     "shelljs": "0.8.5",
     "follow-redirects": "1.15.3",

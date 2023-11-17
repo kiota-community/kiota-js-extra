@@ -7,7 +7,7 @@ a client for a REST API.
 
 ## Usage
 
-In your `package.json` file, you must add the `@redhat-developer/kiota-gen` package
+In your `package.json` file, you must add the `@kiota/kiota-gen` package
 as a dev dependency, something like this:
 
 ```json
@@ -15,7 +15,7 @@ as a dev dependency, something like this:
   "name": "kiota-gen-example",
   "version": "0.1.0",
   "devDependencies": {
-    "@redhat-developer/kiota-gen": "0.1.0"
+    "@kiota/kiota-gen": "0.1.0"
   }
 }
 ```

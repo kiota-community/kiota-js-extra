@@ -23,7 +23,15 @@
   },
   "homepage": "https://github.com/Apicurio/kiota-js-extra#readme",
   "devDependencies": {
-    "@redhat-developer/kiota-gen": "file:../kiota-gen",
+    "@kiota/kiota-gen": "file:../kiota-gen",
     "rimraf": "5.0.5"
+  },
+  "dependencies": {
+    "@microsoft/kiota-abstractions": "1.0.0-preview.32",
+    "@microsoft/kiota-serialization-json": "1.0.0-preview.32",
+    "@microsoft/kiota-serialization-text": "1.0.0-preview.29",
+    "@microsoft/kiota-serialization-multipart": "1.0.0-preview.11",
+    "@microsoft/kiota-serialization-form": "1.0.0-preview.21",
+    "@microsoft/kiota-http-fetchlibrary": "1.0.0-preview.31"
   }
 }
