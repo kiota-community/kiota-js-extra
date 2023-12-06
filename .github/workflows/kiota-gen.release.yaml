@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-verify:
-    name: Verify Build
+    name: Release Kiota Gen
     runs-on: ubuntu-latest
     steps:
       - name: Setup Node
