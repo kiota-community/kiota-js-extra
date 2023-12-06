@@ -1,5 +1,5 @@
 {
-  "name": "@kiota/kiota-gen",
+  "name": "@kiota-community/kiota-gen",
   "version": "SNAPSHOT",
   "description": "Wrapper around the Kiota command line for generating client SDKs from OpenAPI.",
   "main": "bin/kiota.js",
