@@ -3,9 +3,10 @@
 // ----------------------------------------------------------------------------
 // The following ENV variables can be used to control this tool:
 //
-// KIOTA_VERSION       | The version of Kiota to use.  | Default: 'latest'
-// KIOTA_DOWNLOAD_URL  | Where to download Kiota from. | Default: 'https://github.com/microsoft/kiota/releases/download'
-// KIOTA_DOWNLOAD_DIR  | Where to download Kiota to.   | Default: './.kiota'
+// KIOTA_VERSION       | The version of Kiota to use.                 | Default: 'latest'
+// KIOTA_DOWNLOAD_URL  | Where to download Kiota from.                | Default: 'https://github.com/microsoft/kiota/releases/download'
+// KIOTA_DOWNLOAD_DIR  | Where to download Kiota to.                  | Default: './.kiota'
+// KIOTA_BINARY        | Path to an existing installation of Kiota.   | Default: '~/kiota'
 // ----------------------------------------------------------------------------
 
 
@@ -23,6 +24,7 @@ const GITHUB_REQUEST_OPTIONS = {
 };
 let KIOTA_DOWNLOAD_URL = process.env["KIOTA_DOWNLOAD_URL"];
 let KIOTA_DOWNLOAD_DIR = process.env["KIOTA_DOWNLOAD_DIR"];
+let KIOTA_BINARY = process.env["KIOTA_BINARY"];
 
 
 // --------------------------------
@@ -173,14 +175,30 @@ const kiota = async (kiotaVersion, args) => {
     } else {
         throw new Error(`Unsupported architecture: ${architecture}`);
     }
+
+    let kiotaCmd = '';
+    if(KIOTA_BINARY !== undefined && KIOTA_BINARY !== "") {
+        kiotaCmd = KIOTA_BINARY;
+        kiotaVersion = await new Promise((resolve, reject) => {
+            shell.exec(KIOTA_BINARY + " --version", { silent: true }, (code, stdout, stderr) => {
+                if (code > 0) {
+                    reject(new Error("Kiota failed."));
+                } else {
+                    resolve(stdout.trim());
+                }
+            });
+        });  
+    } else {
+        kiotaCmd = await downloadAndInstallKiota(kiotaVersion, os, arch);
+    }
+    
     console.log(`---`)
     console.log(`Executing Kiota CLI using:`)
     console.log(`    Kiota version: ${kiotaVersion}`)
     console.log(`    Platform: ${os}`)
     console.log(`    Architecture: ${arch}`)
     console.log(`---`)
-
-    const kiotaCmd = await downloadAndInstallKiota(kiotaVersion, os, arch);
+    
     const kiotaCmdWithArgs = kiotaCmd + " " + args.join(" ");
 
     console.log(kiotaCmdWithArgs);
