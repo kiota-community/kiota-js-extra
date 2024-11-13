@@ -27,7 +27,7 @@
   "homepage": "https://github.com/kiota-community/kiota-js-extra#readme",
   "dependencies": {
     "shelljs": "0.8.5",
-    "follow-redirects": "1.15.3",
+    "follow-redirects": "1.15.9",
     "decompress": "4.2.1"
   }
 }

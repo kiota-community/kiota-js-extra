@@ -26,6 +26,10 @@ let KIOTA_DOWNLOAD_URL = process.env["KIOTA_DOWNLOAD_URL"];
 let KIOTA_DOWNLOAD_DIR = process.env["KIOTA_DOWNLOAD_DIR"];
 let KIOTA_BINARY = process.env["KIOTA_BINARY"];
 
+// If the configured URL ends with a "/", strip it out.
+if (KIOTA_DOWNLOAD_URL !== undefined && KIOTA_DOWNLOAD_URL !== null && KIOTA_DOWNLOAD_URL.endsWith("/")) {
+    KIOTA_DOWNLOAD_URL = KIOTA_DOWNLOAD_URL.substring(0, KIOTA_DOWNLOAD_URL.length - 1);
+}
 
 // --------------------------------
 // Imports from dependencies
@@ -33,6 +37,7 @@ let KIOTA_BINARY = process.env["KIOTA_BINARY"];
 const followRedirects = require("follow-redirects");
 const { https } = followRedirects;
 const fs = require("fs");
+const url = require("url");
 const path = require("path");
 const decompress = require("decompress");
 const shell = require("shelljs");
@@ -115,19 +120,16 @@ const downloadAndInstallKiota = async (kiotaVersion, os, arch) => {
 
     return new Promise((resolve, reject) => {
         const kiotaUrl = `${KIOTA_DOWNLOAD_URL}/${kiotaVersion}/${os}-${arch}.zip`;
-        console.log(`Downloading Kiota binary from ${kiotaUrl}`);
-        https.get(kiotaUrl, GITHUB_REQUEST_OPTIONS, (res) => {
-            const statusCode = res.statusCode;
-            if (statusCode !== 200) {
-                const error = new Error(`Request Failed.\nStatus Code: ${statusCode}`);
+
+        if (kiotaUrl.startsWith("file:")) {
+            const sourcePath = url.fileURLToPath(kiotaUrl);
+            console.log(`Copying Kiota binary from ${sourcePath}`);
+            if (!fs.existsSync(sourcePath)) {
+                const error = new Error(`File not found: ${sourcePath}`);
                 console.error(error.message);
-                res.resume();
                 reject(error);
             } else {
-                const writeStream = fs.createWriteStream(downloadPath);
-                res.pipe(writeStream);
-                writeStream.on("finish", () => {
-                    console.log(`Kiota binary version ${kiotaVersion} downloaded at ${downloadPath}`);
+                fs.promises.copyFile(sourcePath, downloadPath).then(() => {
                     decompress(downloadPath, execPath)
                         .then(() => {
                             resolve(execBinary);
@@ -135,13 +137,39 @@ const downloadAndInstallKiota = async (kiotaVersion, os, arch) => {
                         .catch((error) => {
                             reject(error);
                         });
-                });
-                writeStream.on("error", (err) => {
-                    console.error(`Failed to write Kiota binary version ${kiotaVersion} to ${downloadPath}: ${err.message}`);
-                    reject(err);
+                }).catch((error) => {
+                    reject(error);
                 });
             }
-        });
+        } else {
+            console.log(`Downloading Kiota binary from ${kiotaUrl}`);
+            https.get(kiotaUrl, GITHUB_REQUEST_OPTIONS, (res) => {
+                const statusCode = res.statusCode;
+                if (statusCode !== 200) {
+                    const error = new Error(`Request Failed.\nStatus Code: ${statusCode}`);
+                    console.error(error.message);
+                    res.resume();
+                    reject(error);
+                } else {
+                    const writeStream = fs.createWriteStream(downloadPath);
+                    res.pipe(writeStream);
+                    writeStream.on("finish", () => {
+                        console.log(`Kiota binary version ${kiotaVersion} downloaded at ${downloadPath}`);
+                        decompress(downloadPath, execPath)
+                            .then(() => {
+                                resolve(execBinary);
+                            })
+                            .catch((error) => {
+                                reject(error);
+                            });
+                    });
+                    writeStream.on("error", (err) => {
+                        console.error(`Failed to write Kiota binary version ${kiotaVersion} to ${downloadPath}: ${err.message}`);
+                        reject(err);
+                    });
+                }
+            });
+        }
     });
 };
 
