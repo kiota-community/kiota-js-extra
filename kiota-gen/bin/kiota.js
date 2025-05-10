@@ -236,8 +236,8 @@ const kiota = async (kiotaVersion, args) => {
     console.log(`    Platform: ${os}`)
     console.log(`    Architecture: ${arch}`)
     console.log(`---`)
-    
-    const kiotaCmdWithArgs = kiotaCmd + " " + args.join(" ");
+
+    const kiotaCmdWithArgs = `"${kiotaCmd}" ${args.join(" ")}`;
 
     console.log(kiotaCmdWithArgs);
 
