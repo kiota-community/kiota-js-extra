@@ -100,6 +100,8 @@ const getLatestKiotaReleaseVersion = async () => {
  * been downloaded, it will skip the download and just return the path to
  * the CLI.
  * @param kiotaVersion
+ * @param os {"win"|"linux"|"osx"}
+ * @param arch {"x64"|"x86"|"arm64"}
  * @returns {Promise<void>}
  */
 const downloadAndInstallKiota = async (kiotaVersion, os, arch) => {
@@ -111,11 +113,19 @@ const downloadAndInstallKiota = async (kiotaVersion, os, arch) => {
 
     // Path to the Kiota CLI
     const execBinary = path.join(process.cwd(), '.kiota', `${kiotaVersion}`, 'kiota');
-
+    
     if (fs.existsSync(execBinary)) {
         // Kiota was already downloaded and/or installed in the .kiota directory
         console.log(`Kiota binary version ${kiotaVersion} already downloaded at ${downloadPath}`);
         return Promise.resolve(execBinary);
+    
+    } else if (os === "win") { 
+        // https://github.com/kiota-community/kiota-js-extra/issues/12
+        const winOnlyExecBinary = `${execBinary}.exe`;
+        if (fs.existsSync(winOnlyExecBinary)) {
+            console.log(`Kiota binary version ${kiotaVersion} already downloaded at ${downloadPath}`);
+            return Promise.resolve(winOnlyExecBinary);
+        }
     }
 
     return new Promise((resolve, reject) => {
@@ -226,8 +236,8 @@ const kiota = async (kiotaVersion, args) => {
     console.log(`    Platform: ${os}`)
     console.log(`    Architecture: ${arch}`)
     console.log(`---`)
-    
-    const kiotaCmdWithArgs = kiotaCmd + " " + args.join(" ");
+
+    const kiotaCmdWithArgs = `"${kiotaCmd}" ${args.join(" ")}`;
 
     console.log(kiotaCmdWithArgs);
 
