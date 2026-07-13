@@ -7,6 +7,8 @@
 // KIOTA_DOWNLOAD_URL  | Where to download Kiota from.                | Default: 'https://github.com/microsoft/kiota/releases/download'
 // KIOTA_DOWNLOAD_DIR  | Where to download Kiota to.                  | Default: './.kiota'
 // KIOTA_BINARY        | Path to an existing installation of Kiota.   | Default: '~/kiota'
+// HTTPS_PROXY         | HTTPS proxy URL for downloading Kiota.       | Default: (none)
+// HTTP_PROXY          | HTTP proxy URL (fallback if HTTPS_PROXY unset)| Default: (none)
 // ----------------------------------------------------------------------------
 
 
@@ -22,6 +24,7 @@ const GITHUB_REQUEST_OPTIONS = {
         "User-Agent": "node.js/*.*",
     }
 };
+
 let KIOTA_DOWNLOAD_URL = process.env["KIOTA_DOWNLOAD_URL"];
 let KIOTA_DOWNLOAD_DIR = process.env["KIOTA_DOWNLOAD_DIR"];
 let KIOTA_BINARY = process.env["KIOTA_BINARY"];
@@ -36,11 +39,22 @@ if (KIOTA_DOWNLOAD_URL !== undefined && KIOTA_DOWNLOAD_URL !== null && KIOTA_DOW
 // --------------------------------
 const followRedirects = require("follow-redirects");
 const { https } = followRedirects;
+const { HttpsProxyAgent } = require("https-proxy-agent");
 const fs = require("fs");
 const url = require("url");
 const path = require("path");
 const decompress = require("decompress");
 const shell = require("shelljs");
+
+// --------------------------------
+// Proxy support
+// --------------------------------
+const PROXY_URL = process.env["HTTPS_PROXY"] || process.env["https_proxy"]
+               || process.env["HTTP_PROXY"]  || process.env["http_proxy"];
+if (PROXY_URL) {
+    GITHUB_REQUEST_OPTIONS.agent = new HttpsProxyAgent(PROXY_URL);
+    console.log(`Using proxy: ${PROXY_URL}`);
+}
 
 // --------------------------------
 // Extract configuration from env
