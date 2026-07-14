@@ -10,18 +10,18 @@ jobs:
   release:
     name: Release Kiota Gen
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 24
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Check Node Version
-        run: node --version
-
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build Project
         run: |
@@ -35,8 +35,8 @@ jobs:
           npm version ${{ github.event.inputs.release-version }}
 
       - name: Publish to npmjs.com
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd kiota-gen/dist
-          npm publish --access public
+          npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ''
