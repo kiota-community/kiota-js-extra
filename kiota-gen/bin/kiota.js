@@ -43,7 +43,7 @@ const { HttpsProxyAgent } = require("https-proxy-agent");
 const fs = require("fs");
 const url = require("url");
 const path = require("path");
-const decompress = require("decompress");
+const decompress = (...args) => import("@xhmikosr/decompress").then((m) => m.default(...args));
 const shell = require("shelljs");
 
 // --------------------------------
